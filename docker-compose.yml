@@ -1,0 +1,31 @@
+services:
+  pylearn:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pylearn
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Dev mode (optional)
+  pylearn-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pylearn-dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    profiles:
+      - dev
